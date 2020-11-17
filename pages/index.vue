@@ -1,89 +1,94 @@
 <template>
   <v-row justify="center" align="center">
     <v-col cols="12" sm="8" md="6">
-      <div class="text-center">
-        <logo />
-        <vuetify-logo />
+      <template v-if="options.length > 0" >
+      <v-card-title class="question"> {{ question }} </v-card-title>
+      <radio
+        v-bind:options="options"
+        v-model="answer"
+        v-on:answer-select="updateAnswer"
+      ></radio>
+      <div class="flex-center">
+        <v-btn @click="clickHandler"> submit </v-btn>
       </div>
-      <v-card>
-        <v-card-title class="headline">
-          Welcome to the Vuetify + Nuxt.js template
-        </v-card-title>
-        <v-card-text>
-          <p>Vuetify is a progressive Material Design component framework for Vue.js. It was designed to empower developers to create amazing applications.</p>
-          <p>
-            For more information on Vuetify, check out the <a
-              href="https://vuetifyjs.com"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              documentation
-            </a>.
-          </p>
-          <p>
-            If you have questions, please join the official <a
-              href="https://chat.vuetifyjs.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              title="chat"
-            >
-              discord
-            </a>.
-          </p>
-          <p>
-            Find a bug? Report it on the github <a
-              href="https://github.com/vuetifyjs/vuetify/issues"
-              target="_blank"
-              rel="noopener noreferrer"
-              title="contribute"
-            >
-              issue board
-            </a>.
-          </p>
-          <p>Thank you for developing with Vuetify and I look forward to bringing more exciting features in the future.</p>
-          <div class="text-xs-right">
-            <em><small>&mdash; John Leider</small></em>
-          </div>
-          <hr class="my-3">
-          <a
-            href="https://nuxtjs.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Nuxt Documentation
-          </a>
-          <br>
-          <a
-            href="https://github.com/nuxt/nuxt.js"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Nuxt GitHub
-          </a>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn
-            color="primary"
-            nuxt
-            to="/inspire"
-          >
-            Continue
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-col>
-  </v-row>
+      </template>
+    </v-col></v-row
+  >
 </template>
-
 <script>
-import Logo from '~/components/Logo.vue'
-import VuetifyLogo from '~/components/VuetifyLogo.vue'
+const sampleData = [
+  {
+    question: 'How many states are there in India?',
+    options: [28, 29, 30, 32],
+  },
+  {
+    question: 'How many rivers are there in Kerala?',
+    options: [44, 46, 56, 53],
+  },
+]
+
+import Radio from '~/components/Radio'
 
 export default {
   components: {
-    Logo,
-    VuetifyLogo
-  }
+    Radio,
+  },
+  created() {
+    this.fetchData()
+  },
+  methods: {
+    fetchData: async function (params) {
+      const ref = this.$fire.firestore.collection('questions')
+      try {
+        const snapshot = await ref.get()
+        let items = [];
+        snapshot.forEach((doc, index) => {
+          items.push({
+              ...doc.data()
+            });
+        })
+        this.documents = items;
+        this.options = this.documents[0].options;
+        this.question = this.documents[0].text
+        this.correctAns = this.documents[0].answer
+      } catch (e) {
+        return Promise.reject(e)
+      }
+    },
+    clickHandler: function (params) {
+      
+    
+      if(this.answer === this.options[this.correctAns]) {
+        console.log("correct")
+      } else {
+        console.log("wrong")
+      }
+      
+    },
+    updateAnswer: function (params) {
+      
+      this.answer = params
+    },
+  },
+  data() {
+    return {
+      documents: [],
+      question: "",
+      options: [],
+      answer: null,
+      correctAns: null
+    }
+  },
 }
 </script>
+
+<style  scoped>
+.question {
+  justify-content: center;
+}
+.flex-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+</style>

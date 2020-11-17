@@ -45,6 +45,33 @@ export default {
     '@nuxtjs/pwa',
     // https://go.nuxtjs.dev/content
     '@nuxt/content',
+
+    [
+      '@nuxtjs/firebase',
+      {
+        config: {
+          apiKey: process.env.VUE_APP_APIKEY,
+          authDomain: process.env.VUE_APP_AUTHDOMAIN,
+          databaseURL: process.env.VUE_APP_DATABASEURL,
+          projectId: process.env.VUE_APP_PROJECTID,
+          storageBucket: process.env.VUE_APP_STORAGEBUCKET,
+          messagingSenderId: process.env.VUE_APP_MESSAGINGSENDERID,
+          appId: process.env.VUE_APP_APPID,
+          measurementId: process.env.VUE_APP_MEASUREMENTID
+        },
+        services: {
+          auth: true,
+          firestore: true,
+          functions: true,
+          storage: true,
+          database: true,
+          messaging: true,
+          performance: true,
+          analytics: true,
+          remoteConfig: true
+        }
+      }
+    ]
   ],
 
   // Axios module configuration (https://go.nuxtjs.dev/config-axios)
