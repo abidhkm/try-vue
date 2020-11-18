@@ -1,19 +1,20 @@
 <template>
   <v-row justify="center" align="center">
     <v-col cols="12" sm="8" md="6">
-      <template v-if="options.length > 0" >
-      <v-card-title class="question"> {{ question }} </v-card-title>
-      <radio
-        v-bind:options="options"
-        v-model="answer"
-        v-on:answer-select="updateAnswer"
-      ></radio>
-      <div class="flex-center">
-        <v-btn @click="clickHandler"> submit </v-btn>
-      </div>
+      <template v-if="options.length > 0">
+        <v-card-title class="question">{{ question }}</v-card-title>
+        <radio v-bind:options="options" v-model="answer" v-on:answer-select="updateAnswer"></radio>
+        <div class="flex-center">
+          <v-btn v-if="!submitted" @click="clickHandler">Submit</v-btn>
+          <v-btn v-if="submitted" @click="proceedHandler">Proceed</v-btn>
+          <p
+            class="status"
+            v-if="submitted"
+          >{{isAnsCorrect ? "Correct answer" : `Wrong answer!! \n Correct answer is option ${correctAns}`}}</p>
+        </div>
       </template>
-    </v-col></v-row
-  >
+    </v-col>
+  </v-row>
 </template>
 <script>
 const sampleData = [
@@ -55,14 +56,26 @@ export default {
         return Promise.reject(e)
       }
     },
+    proceedHandler: function (params) {
+      console.log("proceed")
+      this.qNo++;
+      this.options = this.documents[this.qNo].options;
+        this.question = this.documents[this.qNo].text
+        this.correctAns = this.documents[this.qNo].answer
+        this.submitted = false
+    },
     clickHandler: function (params) {
       
     
       if(this.answer === this.options[this.correctAns]) {
         console.log("correct")
+        this.isAnsCorrect = true;
       } else {
         console.log("wrong")
+        this.isAnsCorrect = false;
       }
+
+      this.submitted = true;
       
     },
     updateAnswer: function (params) {
@@ -72,11 +85,14 @@ export default {
   },
   data() {
     return {
+      qNo:0,
       documents: [],
       question: "",
       options: [],
       answer: null,
-      correctAns: null
+      correctAns: null,
+      submitted: false,
+      isAnsCorrect: false
     }
   },
 }
@@ -90,5 +106,8 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+.status {
+  margin: 15px 0;
 }
 </style>
